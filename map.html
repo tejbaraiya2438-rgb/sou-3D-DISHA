@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#062051">
+  <meta name="description" content="SOU 3D DISHA — campus wayfinding, rooms, labs, staff and schedules for Silver Oak University.">
+  <title>SOU 3D DISHA — Find your way</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/disha.css">
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"}}</script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#home" aria-label="SOU 3D DISHA Home">
+        <span class="brand-mark official-brand"><img src="/static/assets/sou-university-logo.svg" alt="Silver Oak University"></span>
+        <span class="brand-text"><b>SOU 3D</b><small>DISHA</small></span>
+      </a>
+      <div class="campus-label">CAMPUS COMPANION</div>
+      <nav class="side-nav" aria-label="Main navigation">
+        <button class="nav-link active" data-view="home"><span class="nav-icon">⌂</span><span>Overview</span></button>
+        <button class="nav-link" data-view="map"><span class="nav-icon">◎</span><span>Map & directions</span></button>
+        <button class="nav-link" data-view="directory"><span class="nav-icon">▦</span><span>Explore places</span></button>
+        <button class="nav-link" data-view="faculty"><span class="nav-icon">♙</span><span>Faculty & staff</span></button>
+        <button class="nav-link gated-nav" data-view="timetable"><span class="nav-icon">▤</span><span>My timetable</span><span class="lock-mark">●</span></button>
+        <button class="nav-link" data-view="events"><span class="nav-icon">◷</span><span>Events & exams</span></button>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-note"><span class="status-dot"></span><span><b>Campus explorer</b><small>Silver Oak · Gota, Ahmedabad</small></span></div>
+      <div class="sidebar-profile" id="profileCard"></div>
+      <button class="nav-link admin-nav hidden" id="adminNav" data-view="admin"><span class="nav-icon">⚙</span><span>Admin workspace</span></button>
+      <div class="sidebar-foot">LOCAL PREVIEW <span>·</span> v1.0</div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <button id="mobileMenu" class="icon-button mobile-menu" aria-label="Open menu">☰</button>
+        <div class="top-context"><span>Silver Oak University</span><span class="crumb-dot">/</span><strong id="pageLabel">Overview</strong></div>
+        <div class="top-actions">
+          <label class="global-search"><span>⌕</span><input id="globalSearch" type="search" placeholder="Find a room, lab, teacher…" autocomplete="off"><kbd>⌘ K</kbd><div id="globalResults" class="search-results hidden"></div></label>
+          <button class="role-pill" id="roleButton"><span class="role-avatar" id="roleAvatar">V</span><span id="roleLabel">Visitor</span><span class="chevron">⌄</span></button>
+        </div>
+      </header>
+      <div class="mobile-nav-overlay hidden" id="mobileOverlay"></div>
+
+      <section class="view active" id="view-home" data-title="Overview">
+        <div class="page-wrap">
+          <div class="hero-grid">
+            <div class="welcome-card">
+              <div class="eyebrow"><span class="live-indicator"></span> YOUR CAMPUS, MADE EASIER</div>
+              <h1>Find your way<br><span>around SOU.</span></h1>
+              <p>Explore campus spaces, get room-to-room directions and find the people and places you need.</p>
+              <div class="hero-buttons"><button class="button button-primary" data-action="open-map">Open campus map <span>↗</span></button><button class="button button-light" data-action="focus-search">Search campus</button></div>
+              <div class="hero-footnote"><span class="tiny-shield">✓</span> No account needed for campus wayfinding</div>
+            </div>
+            <div class="campus-photo-card">
+              <img src="/static/assets/sou-campus-aerial.jpg" alt="Aerial view of Silver Oak University campus" loading="lazy">
+              <div class="photo-shade"></div>
+              <div class="photo-label"><span class="photo-pin">⌖</span><span><b>Silver Oak University</b><small>Gota · Ahmedabad, Gujarat</small></span><a href="https://maps.app.goo.gl/vDJayrr7HZJDYmnd7" target="_blank" rel="noreferrer" aria-label="Open campus in Google Maps">↗</a></div>
+              <div class="photo-caption">Campus reference photo · not a navigation map</div>
+            </div>
+          </div>
+
+          <div class="section-heading"><div><span class="eyebrow">AT A GLANCE</span><h2>Campus right now</h2></div><span class="updated-note">Live information appears when published</span></div>
+          <div class="live-grid" id="liveCards"></div>
+
+          <div class="section-heading quick-heading"><div><span class="eyebrow">GET THERE FASTER</span><h2>Quick destinations</h2></div><button class="text-button" data-view="directory">Browse all places <span>→</span></button></div>
+          <div class="quick-grid">
+            <button class="quick-card quick-ieee" data-place-query="IEEE Student Branch Cell"><span class="quick-icon">⌘</span><span><b>IEEE Student Cell</b><small>8th floor · E-block</small></span><i>↗</i></button>
+            <button class="quick-card quick-lab" data-place-query="Computer Lab"><span class="quick-icon">▦</span><span><b>Labs</b><small>Chemistry & computer labs</small></span><i>↗</i></button>
+            <button class="quick-card quick-staff" data-place-query="Staff Room"><span class="quick-icon">♙</span><span><b>Staff rooms</b><small>Find a faculty office</small></span><i>↗</i></button>
+            <button class="quick-card quick-route" data-action="open-map"><span class="quick-icon">⌖</span><span><b>Make a destination</b><small>Choose start and end points</small></span><i>↗</i></button>
+          </div>
+
+          <div class="lower-grid">
+            <section class="surface directory-preview"><div class="surface-title"><div><span class="eyebrow">EXPLORE THE BUILDING</span><h3>Browse by category</h3></div><button class="icon-button" data-view="directory" aria-label="Browse">→</button></div><div class="category-grid" id="homeCategories"></div></section>
+            <section class="surface note-card"><div class="note-symbol">i</div><span class="eyebrow">MAP NOTE</span><h3>Know before you go</h3><p>The indoor floor plan is an indicative prototype based on supplied project sketches. Confirm room placements and routes with campus signage until an official floor plan is added.</p><button class="text-button" data-view="map">Explore the floor map <span>→</span></button></section>
+          </div>
+          <footer class="page-footer"><span>© SOU 3D DISHA · Local prototype</span><a href="https://silveroakuni.ac.in/" target="_blank" rel="noreferrer">Silver Oak University ↗</a></footer>
+        </div>
+      </section>
+
+      <section class="view" id="view-map" data-title="Map & directions">
+        <div class="page-wrap map-wrap">
+          <div class="page-heading"><div><span class="eyebrow">INDOOR WAYFINDING</span><h1>Map & directions</h1><p>Choose a floor, find a place, then set your start and destination.</p></div><button class="button button-light" id="resetMap">↺ Reset map</button></div>
+          <div class="map-layout">
+            <div class="map-column">
+              <div class="floor-toolbar"><span class="toolbar-label">FLOOR / CAMPUS</span><div id="floorChips" class="floor-chips" aria-label="Choose campus or floor"></div><span class="map-key"><i></i> Selected destination</span></div>
+              <div class="floor-map-card"><div class="map-topline"><div><b id="mapFloorName">Campus · 3D view</b><small id="mapFloorSub">Interactive campus context · Silver Oak E-block</small></div><button class="icon-button" id="zoomToggle" aria-label="Reset 3D camera" title="Reset 3D camera">◎</button></div><div class="map-viewport disha3d-frame" id="mapViewport"><div id="disha3dStage"></div><div class="disha3d-overlay"><span class="disha3d-badge">3D CAMPUS MODEL</span><small>Drag to orbit · pinch to zoom · tap photo pins to view</small></div><div class="disha3d-loading" id="disha3dStatus">Loading the interactive 3D campus…</div></div><div class="map-legend"><span><i class="legend-room"></i> E-block floors</span><span><i class="legend-hall"></i> Halls & cells</span><span><i class="legend-lab"></i> Labs</span><span><i class="legend-route"></i> Animated route</span></div></div>
+              <div class="map-caveat"><b>3D campus model:</b> campus buildings and room positions use supplied prototype geometry and are indicative, not a surveyed architectural model. Routes are simulated; confirm locations on site.</div>
+            </div>
+            <aside class="map-controls">
+              <div class="control-head"><span class="eyebrow">3D INDOOR WAYFINDING</span><h2>Where to?</h2><p>Choose a start and destination to see animated directions on the 3D model.</p></div>
+              <label class="field-label" for="routeStart">STARTING POINT</label><div class="input-with-icon"><span>⌖</span><input id="routeStart" list="placeOptions" placeholder="Main Entrance or room…"><button class="micro-button" id="setEntrance" type="button">Use entrance</button></div>
+              <label class="field-label" for="routeEnd">DESTINATION</label><div class="input-with-icon"><span>◎</span><input id="routeEnd" list="placeOptions" placeholder="Search a room, lab, cell…"></div>
+              <datalist id="placeOptions"></datalist>
+              <div class="route-options"><label class="check-line"><input type="checkbox" id="stepFree"><span class="check-ui"></span><span>Prefer lifts / step-free</span></label><button class="text-button" id="useGps">Use my location</button></div>
+              <div class="route-actions"><button class="button button-primary full-width" id="findRoute">Find route <span>→</span></button><button class="button button-outline full-width" id="clearRoute">Clear route</button></div>
+              <div id="routeResult" class="route-result hidden"></div>
+              <div class="control-divider"></div>
+              <label class="field-label" for="mapSearch">SEARCH THIS MAP</label><div class="input-with-icon"><span>⌕</span><input id="mapSearch" type="search" placeholder="Try ‘lab’ or ‘601’"></div>
+              <div class="map-filter-row" id="mapFilters"></div>
+              <div class="map-results" id="mapResults"></div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-directory" data-title="Explore places">
+        <div class="page-wrap">
+          <div class="page-heading"><div><span class="eyebrow">CAMPUS DIRECTORY</span><h1>Explore places</h1><p>Search classrooms, staff rooms, labs, halls, cells and campus facilities.</p></div><button class="button button-primary" data-action="open-map">Plan a route <span>↗</span></button></div>
+          <div class="directory-toolbar"><div class="directory-search input-with-icon"><span>⌕</span><input id="directorySearch" type="search" placeholder="Search places, room numbers, teachers…"></div><select id="categorySelect" aria-label="Filter category"><option value="all">All categories</option></select><select id="directoryFloor" aria-label="Filter floor"><option value="all">All floors</option></select></div>
+          <div class="directory-meta"><span id="directoryCount">—</span><span>Tap a place to view details or start directions</span></div>
+          <div class="directory-content"><div class="place-list" id="placeList"></div><aside class="surface place-detail" id="placeDetail"><div class="empty-detail"><span>◎</span><b>Select a place</b><p>Details, floor and route actions will appear here.</p></div></aside></div>
+        </div>
+      </section>
+
+      <section class="view" id="view-faculty" data-title="Faculty & staff">
+        <div class="page-wrap">
+          <div class="page-heading"><div><span class="eyebrow">PEOPLE DIRECTORY</span><h1>Faculty & staff</h1><p>Find a teacher, check their subject and see their default campus location.</p></div><button class="button button-primary" data-view="map">Open 3D map <span>↗</span></button></div>
+          <div class="faculty-summary" id="facultySummary"></div>
+          <section class="surface faculty-section"><div class="surface-title"><div><span class="eyebrow">SEARCH PEOPLE</span><h2>Faculty directory</h2><p>Search by name, initials, subject or staff-room number.</p></div><div class="input-with-icon faculty-search"><span>⌕</span><input id="facultySearch" type="search" placeholder="Teacher name, subject or initials"></div></div><div class="faculty-grid" id="facultyGrid"></div></section>
+        </div>
+      </section>
+
+      <section class="view" id="view-timetable" data-title="My timetable">
+        <div class="page-wrap"><div class="page-heading"><div><span class="eyebrow">A1 · SEMESTER 1</span><h1>My timetable</h1><p>Supplied A1 schedule · effective 22 July 2026. Check with your department for changes.</p></div><span class="private-badge">STUDENT / FACULTY ACCESS</span></div><div class="timetable-warning"><span>i</span><div><b>Schedule source & scope</b><small>This view transcribes only the A1 column in the supplied College of Technology timetable. Some time cells list parallel group entries; use the group assigned to you. Room codes and source abbreviations are shown as supplied.</small></div></div><div class="day-tabs" id="dayTabs"></div><div class="surface timetable-surface"><div class="timetable-header"><div><span class="eyebrow" id="dayEyebrow">MONDAY</span><h2 id="dayTitle">Monday</h2></div><span class="term-tag">W.E.F. 22 JUL 2026</span></div><div id="timetableRows" class="timetable-rows"></div></div><div class="faculty-note"><b>Faculty finder</b><span>Find an instructor and route to the supplied default staff-room location.</span><button class="text-button" data-view="faculty">Open Faculty & staff →</button></div></div>
+      </section>
+
+      <section class="view" id="view-events" data-title="Events & exams">
+        <div class="page-wrap"><div class="page-heading"><div><span class="eyebrow">WHAT’S ON AT SOU</span><h1>Events & exams</h1><p>Published campus updates, event details and exam information.</p></div><button class="button button-primary hidden admin-only" data-action="manage-events">+ Add update</button></div><div class="event-status-banner" id="eventNowBanner"></div><div class="event-tabs" id="eventTabs"><button class="active" data-event-tab="all">All updates</button><button data-event-tab="event">Events</button><button data-event-tab="exam">Exams</button></div><div id="eventsList" class="events-list"></div><div class="no-live-note">Published events and exams sync from this server. Confirm official notices with the university.</div></div>
+      </section>
+
+      <section class="view" id="view-admin" data-title="Admin workspace">
+        <div class="page-wrap"><div class="page-heading"><div><span class="eyebrow">CONTENT MANAGEMENT</span><h1>Admin workspace</h1><p>Manage campus directory records, people, events and exam information.</p></div><span class="admin-badge">ADMIN ONLY</span></div>
+          <div class="admin-notice"><span>⚙</span><div><b>Local preview mode</b><small>Events and exams sync to visitors when the local API server is running. This demo login is not secure and is not connected to a live university system.</small></div></div>
+          <div class="admin-tabs" id="adminTabs"><button class="active" data-admin-tab="overview">Overview</button><button data-admin-tab="places">Destinations</button><button data-admin-tab="faculty">Faculty & staff</button><button data-admin-tab="updates">Events & exams</button></div>
+          <div class="admin-panel active" id="admin-overview"><div class="admin-panel-title"><div><h2>Campus operations dashboard</h2><p>Content coverage, data health and local admin tools.</p></div><span class="admin-live-badge"><i></i> LOCAL DEMO</span></div><div class="admin-metrics" id="adminMetrics"></div><div class="admin-overview-grid"><section class="admin-insight-card"><div class="admin-insight-head"><div><span class="eyebrow">MAP COVERAGE</span><h3>Destinations by floor</h3></div><span class="admin-insight-icon">▦</span></div><div id="adminFloorCoverage" class="admin-floor-coverage"></div><p class="admin-help-note">Room positions and route lengths are indicative until checked against an official plan.</p></section><section class="admin-insight-card"><div class="admin-insight-head"><div><span class="eyebrow">DATA HEALTH</span><h3>Prototype status</h3></div><span class="admin-insight-icon">✓</span></div><div id="adminHealthSummary" class="admin-health-list"></div></section></div><section class="admin-tools-bar"><div><b>Backup & operations</b><small>Export the loaded destination, staff and event records as a JSON backup.</small></div><div class="admin-tool-buttons"><button class="button button-light" id="exportBackup">Download JSON backup</button><button class="button button-primary" data-action="open-map">Open 3D map <span>↗</span></button></div></section></div>
+          <div class="admin-panel active" id="admin-places"><div class="admin-panel-title"><div><h2>Destination directory</h2><p>Edit public place information, categories and floor details.</p></div><button class="button button-primary" data-action="add-place">+ Add destination</button></div><div class="admin-records" id="adminPlaceRecords"></div></div>
+          <div class="admin-panel" id="admin-faculty"><div class="admin-panel-title"><div><h2>Faculty & staff</h2><p>Maintain teacher subjects, staff rooms and directory visibility.</p></div><button class="button button-primary" data-action="add-faculty">+ Add teacher</button></div><div class="admin-records" id="adminFacultyRecords"></div></div>
+          <div class="admin-panel" id="admin-updates"><div class="admin-panel-title"><div><h2>Events & exams</h2><p>Create or edit published updates. Admin-created updates are protected from deletion.</p></div><button class="button button-primary" data-action="add-update">+ Add event / exam</button></div><div class="admin-records" id="adminUpdateRecords"></div></div>
+        </div>
+      </section>
+
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+      <div id="modalRoot"></div>
+    </main>
+  </div>
+  <script type="module" src="/static/js/disha-app.js"></script>
+
+<script type="module" src="/static/js/map-bridge.js"></script>
+<script src="/static/js/voice.js"></script>
+<script src="/static/js/sili-float.js"></script>
+
+<div id="roomViewBar" style="display:none;position:fixed;bottom:88px;left:50%;transform:translateX(-50%);z-index:10040;background:#062051;color:#fff;padding:10px 16px;border-radius:24px;box-shadow:0 8px 24px rgba(0,0,0,.25);gap:10px;align-items:center;font-family:system-ui,sans-serif;font-size:13px;">
+  <span id="roomViewLabel">Classroom interior</span>
+  <button type="button" id="roomViewEnter" style="background:#c43b5e;color:#fff;border:none;border-radius:16px;padding:6px 12px;cursor:pointer;font-weight:600;">Enter 3D room</button>
+  <button type="button" id="roomViewExit" style="display:none;background:#fff;color:#062051;border:none;border-radius:16px;padding:6px 12px;cursor:pointer;font-weight:600;">Exit room view</button>
+</div>
+<script>
+(function(){
+  function codeOf(p){return String(p&&p.code||'').replace(/^EA-?/i,'');}
+  function isTarget(p){return p&&p.floor===5&&['511','512','513'].includes(codeOf(p));}
+  function refresh(){
+    var bar=document.getElementById('roomViewBar');
+    if(!bar||!window.Disha3D)return;
+    var interior=window.Disha3D.isInteriorActive&&window.Disha3D.isInteriorActive();
+    var sel=window.__siliSelectedRoom;
+    if(interior){
+      bar.style.display='flex';
+      document.getElementById('roomViewEnter').style.display='none';
+      document.getElementById('roomViewExit').style.display='inline-block';
+      document.getElementById('roomViewLabel').textContent='Inside classroom (EA · Floor 5)';
+    }else if(sel&&isTarget(sel)){
+      bar.style.display='flex';
+      document.getElementById('roomViewEnter').style.display='inline-block';
+      document.getElementById('roomViewExit').style.display='none';
+      document.getElementById('roomViewLabel').textContent='Classroom '+codeOf(sel)+' · interior available';
+    }else{
+      bar.style.display='none';
+    }
+  }
+  document.addEventListener('click',function(){setTimeout(refresh,200);});
+  document.getElementById('roomViewEnter').onclick=function(){
+    var sel=window.__siliSelectedRoom;
+    if(sel&&window.Disha3D&&window.Disha3D.enterRoomView(sel)) refresh();
+  };
+  document.getElementById('roomViewExit').onclick=function(){
+    if(window.Disha3D) window.Disha3D.exitRoomView();
+    refresh();
+  };
+  window.addEventListener('soumap',function(e){
+    if(e.detail&&e.detail.type==='room'&&e.detail.room){
+      window.__siliSelectedRoom=e.detail.room;
+      refresh();
+    }
+    if(e.detail&&e.detail.type==='interior'){refresh();}
+  });
+  setInterval(refresh,1500);
+})();
+</script>
+
+</body>
+</html>
