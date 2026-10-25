@@ -33,7 +33,7 @@ pip install -r requirements.txt
 # OLLAMA_MODEL=llama3.2
 # ELEVENLABS_API_KEY=...
 # ELEVENLABS_VOICE_ID=...
-# SOU_ADMIN_PASSWORD=admin123
+# SOU_ADMIN_PASSWORD=
 
 uvicorn backend.app:app --host 0.0.0.0 --port 8000
 ```
